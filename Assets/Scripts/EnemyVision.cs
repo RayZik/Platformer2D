@@ -12,11 +12,17 @@ public class EnemyVision : MonoBehaviour
     private Vector2 _origin;
     private Vector2 _direction;
     private float _currentHitDistance;
+    private EnemyController _enemyController;
+
+    private void Start()
+    {
+        _enemyController = GetComponent<EnemyController>();
+    }
 
     private void Update()
     {
         _origin = transform.position;
-        _direction = Vector2.right;
+        _direction = _enemyController.IsFacingRight ? Vector2.right : Vector2.left;
 
         RaycastHit2D hit = Physics2D.CircleCast(_origin, _currentHitDistance, _direction, maxDistance, layerMask);
 

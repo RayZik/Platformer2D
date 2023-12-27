@@ -15,6 +15,10 @@ public class EnemyController : MonoBehaviour
     private Vector2 _leftBoundaryPosition;
     private Vector2 _rightBoundaryPosition;
     private bool _isFacingRight = true;
+    public bool IsFacingRight
+    {
+        get => _isFacingRight;
+    }
     private bool _isWait = false;
     private float _waitTime;
 
