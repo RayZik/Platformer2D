@@ -12,6 +12,7 @@ public class EnemyController : MonoBehaviour
     private float timeToWait = 5f;
 
     private Rigidbody2D _rb;
+    private Transform _playerTransform;
     private Vector2 _leftBoundaryPosition;
     private Vector2 _rightBoundaryPosition;
     private bool _isFacingRight = true;
@@ -20,12 +21,13 @@ public class EnemyController : MonoBehaviour
         get => _isFacingRight;
     }
     private bool _isWait = false;
+    private bool _isChasingPlayer = false;
     private float _waitTime;
 
     void Start()
     {
         _rb = GetComponent<Rigidbody2D>();
-
+        _playerTransform = GameObject.FindGameObjectWithTag("Player").GetComponent<Transform>();
         _leftBoundaryPosition = transform.position;
         _rightBoundaryPosition = _leftBoundaryPosition + Vector2.right * walkDistance;
         _waitTime = timeToWait;
@@ -53,7 +55,16 @@ public class EnemyController : MonoBehaviour
             nextPoint.x *= -1;
         }
 
-        if (!_isWait)
+        if (_isChasingPlayer)
+        {
+            float distance = _playerTransform.position.x - transform.position.x;
+            float multiplier = distance > 0 ? 1 : -1;
+
+            nextPoint *= multiplier;
+
+            _rb.MovePosition((Vector2)transform.position + nextPoint);
+        }
+        else if (!_isWait)
         {
             _rb.MovePosition((Vector2)transform.position + nextPoint);
         }
@@ -63,6 +74,11 @@ public class EnemyController : MonoBehaviour
     {
         Gizmos.color = Color.red;
         Gizmos.DrawLine(_leftBoundaryPosition, _rightBoundaryPosition);
+    }
+
+    public void StartChasingPlying()
+    {
+        _isChasingPlayer = true;
     }
 
     void Flip()
