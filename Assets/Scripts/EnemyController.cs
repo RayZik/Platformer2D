@@ -5,8 +5,10 @@ using UnityEngine;
 public class EnemyController : MonoBehaviour
 {
     [SerializeField] private float walkDistance = 6f;
-    [SerializeField] private float walkSpeed = 1f;
+    [SerializeField] private float patrolSpeed = 1f;
+    [SerializeField] private float chasingSpeed = 3f;
     [SerializeField] private float timeToWait = 5f;
+    [SerializeField] private float timeToChaise = 3f;
     [SerializeField] private float minDistanceToPlayer = 1.5f;
 
     private Rigidbody2D _rb;
@@ -20,7 +22,9 @@ public class EnemyController : MonoBehaviour
     }
     private bool _isWait = false;
     private bool _isChasingPlayer = false;
+    private float _walkSpeed;
     private float _waitTime;
+    private float _chaiseTime;
     private Vector2 _nextPoint;
 
     void Start()
@@ -30,13 +34,20 @@ public class EnemyController : MonoBehaviour
         _leftBoundaryPosition = transform.position;
         _rightBoundaryPosition = _leftBoundaryPosition + Vector2.right * walkDistance;
         _waitTime = timeToWait;
+        _chaiseTime = timeToChaise;
+        _walkSpeed = patrolSpeed;
     }
 
     void Update()
     {
+        if (_isChasingPlayer)
+        {
+            StartChasingTimer();
+        }
+
         if (_isWait && !_isChasingPlayer)
         {
-            Wait();
+            StartWaitTimer();
         }
 
         if (ShouldWait())
@@ -47,9 +58,9 @@ public class EnemyController : MonoBehaviour
 
     void FixedUpdate()
     {
-        _nextPoint = Vector2.right * walkSpeed * Time.fixedDeltaTime;
+        _nextPoint = Vector2.right * _walkSpeed * Time.fixedDeltaTime;
 
-        if (Mathf.Abs(DistanceToPlayer()) < minDistanceToPlayer)
+        if (_isChasingPlayer && Mathf.Abs(DistanceToPlayer()) < minDistanceToPlayer)
         {
             return;
         }
@@ -100,6 +111,8 @@ public class EnemyController : MonoBehaviour
 
     public void StartChasingPlayer()
     {
+        _walkSpeed = chasingSpeed;
+        _chaiseTime = timeToChaise;
         _isChasingPlayer = true;
     }
 
@@ -126,7 +139,7 @@ public class EnemyController : MonoBehaviour
         return isOutOfRightBoundary || isOutOfLeftBoundary;
     }
 
-    private void Wait()
+    private void StartWaitTimer()
     {
         _waitTime -= Time.deltaTime;
 
@@ -135,6 +148,18 @@ public class EnemyController : MonoBehaviour
             _waitTime = timeToWait;
             _isWait = false;
             Flip();
+        }
+    }
+
+    private void StartChasingTimer()
+    {
+        _chaiseTime -= Time.deltaTime;
+
+        if (_chaiseTime <= 0f)
+        {
+            _walkSpeed = patrolSpeed;
+            _chaiseTime = timeToChaise;
+            _isChasingPlayer = false;
         }
     }
 }
