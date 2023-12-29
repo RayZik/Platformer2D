@@ -4,12 +4,12 @@ using UnityEngine;
 
 public class EnemyVision : MonoBehaviour
 {
-    [SerializeField] private GameObject currentHitObject;
     [SerializeField] private float circleRadius = 0.5f;
     [SerializeField] private float maxDistance = 3;
     [SerializeField] private LayerMask layerMask;
 
     private Vector2 _origin;
+    private GameObject _currentHitObject;
     private Vector2 _direction;
     private float _currentHitDistance;
     private EnemyController _enemyController;
@@ -28,17 +28,17 @@ public class EnemyVision : MonoBehaviour
 
         if (hit)
         {
-            currentHitObject = hit.transform.gameObject;
+            _currentHitObject = hit.transform.gameObject;
             _currentHitDistance = hit.distance;
 
-            if (currentHitObject.CompareTag("Player"))
+            if (_currentHitObject.CompareTag("Player"))
             {
-
+                _enemyController.StartChasingPlayer();
             }
         }
         else
         {
-            currentHitObject = null;
+            _currentHitObject = null;
             _currentHitDistance = maxDistance;
         }
     }
